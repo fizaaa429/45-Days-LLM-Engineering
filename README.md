@@ -1,6 +1,6 @@
-# Softpro School of AI — 45-Day AI Development Summer Training
+# Softpro School of AI — 46-Day AI Development Summer Training
 
-> Course code: **SSAI-101** · Duration: 45 days · Build real, deployed LLM & agentic-AI apps on free tiers.
+> Course code: **SSAI-101** · Duration: 46 days · Build real, deployed LLM & agentic-AI apps on free tiers.
 
 This repository holds **all course code, organized day-by-day**. Each day lives under its phase
 folder and is broken into small, numbered, runnable modules so you can learn one idea at a time.
@@ -10,9 +10,9 @@ folder and is broken into small, numbered, runnable modules so you can learn one
 ```
 45-Days-LLM-Engineering/
 ├── Phase-1-Foundations/         Days 1–15
-├── Phase-2-RAG-and-Memory/      Days 16–25
-├── Phase-3-Agents-and-Tools/    Days 26–37
-├── Phase-4-Capstone/            Days 38–45
+├── Phase-2-RAG-and-Memory/      Days 16–26
+├── Phase-3-Agents-and-Tools/    Days 27–38
+├── Phase-4-Capstone/            Days 39–46
 └── docs/                        Syllabus & reference material
 ```
 
@@ -55,13 +55,13 @@ Days **1–7 are a Python power-up** (everything you need before touching an LLM
 
 Days **8–15** begin the AI track: HTTP/`requests`, async, `dotenv`, Pydantic, the **first Groq API call**, prompt engineering, multi-provider patterns, data handling, and Streamlit — leading into **Mini-project 1: AI Content Summarizer**.
 
-### Phase 2 — RAG & Memory (Days 16–25)
-Embeddings, semantic search, Chroma, pgvector/Supabase, chunking, retrieval, re-ranking, LlamaIndex → **Mini-project 2: Document Q&A**.
+### Phase 2 — RAG & Memory (Days 16–26)
+CLI chatbot (conversation memory), embeddings, semantic search, Chroma, pgvector/Supabase, chunking, retrieval, re-ranking, LlamaIndex → **Mini-project 2: Document Q&A**.
 
-### Phase 3 — Agents & Tools (Days 26–37)
+### Phase 3 — Agents & Tools (Days 27–38)
 Function calling, LangChain, LangGraph, ReAct, CrewAI, AutoGen, OpenClaw, observability (Langfuse), guardrails → **Mini-project 3: Research Agent**.
 
-### Phase 4 — Capstone + Placement (Days 38–45)
+### Phase 4 — Capstone + Placement (Days 39–46)
 Capstone build sprint, deployment, demo day, resume/portfolio.
 
 ## The free-tier stack

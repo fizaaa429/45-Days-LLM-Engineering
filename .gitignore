@@ -14,6 +14,9 @@ env/
 .env
 *.local
 
+# Runtime artifacts written by examples
+chat_history.json          # Day 16 chatbot /save output
+
 # OS / editor
 .DS_Store
 Thumbs.db

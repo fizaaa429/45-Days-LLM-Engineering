@@ -12,7 +12,10 @@ pydantic                   # data validation / structured output models
 # --- Phase 1 · Day 9 — First LLM call (Groq, our default provider) ---
 groq                       # Groq API: fast, free-tier Llama models — needs GROQ_API_KEY
 
-# --- Phase 2 · Day 16 — Embeddings (RAG & Memory) ---
+# --- Phase 2 · Day 16 — CLI chatbot ---
+# uses `groq` + `python-dotenv` (already listed above) — no new installs.
+
+# --- Phase 2 · Day 17 — Embeddings (RAG & Memory) ---
 numpy
 sentence-transformers      # local, free embeddings (all-MiniLM-L6-v2) — our default
 google-genai               # optional: Gemini embeddings — needs GEMINI_API_KEY

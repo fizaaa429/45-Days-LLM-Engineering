@@ -3,7 +3,7 @@
 Guidance for Claude Code (and any AI assistant) working in this repository.
 
 ## What this repo is
-Course code for **SSAI-101**, Softpro School of AI's **45-day AI Development Summer Training**
+Course code for **SSAI-101**, Softpro School of AI's **46-day AI Development Summer Training**
 (LLM engineering + agentic AI). It is a *teaching* repo: code here is written to be **read and
 learned from**, not just to run. Audience = students (pre-final/final-year B.Tech, BCA/MCA,
 early-career) with only Python basics as a prerequisite.
@@ -21,7 +21,10 @@ Decks are self-contained branded HTML (reuse the Day-1 career deck as the shared
 slides ≈ 30 min. Days 1–2 are committed; Days 3–7 are drafted locally. Keep `CAREER-PLAN.md` and the
 per-day decks in sync.
 
-**Structure:** 45 days · 3 hrs/day · 4 phases · 3 mini-projects + 1 capstone, all deployed free.
+**Structure:** 46 days · 3 hrs/day · 4 phases · 3 mini-projects + 1 capstone, all deployed free.
+(Day 16 — CLI chatbot — was inserted into Phase 2, shifting every later day +1; the course is now 46
+days. The repo **folder** is still named `45-Days-LLM-Engineering` and the **career track** in
+`CAREER-PLAN.md` is still a 45-day arc — both left as-is for now.)
 
 ## Repository layout
 ```
@@ -32,9 +35,9 @@ per-day decks in sync.
 ├── requirements.txt           Grows as the AI track begins (Day 8+)
 ├── docs/                      Syllabus & reference
 ├── Phase-1-Foundations/       Days 1–15
-├── Phase-2-RAG-and-Memory/    Days 16–25
-├── Phase-3-Agents-and-Tools/  Days 26–37
-└── Phase-4-Capstone/          Days 38–45
+├── Phase-2-RAG-and-Memory/    Days 16–26
+├── Phase-3-Agents-and-Tools/  Days 27–38
+└── Phase-4-Capstone/          Days 39–46
 ```
 
 Days 1–7 are a Python power-up; the AI track starts Day 8. Phase day-ranges are fixed in
@@ -109,9 +112,11 @@ Phase-X-Name/Day-NN-Topic-In-Kebab-Case/
 - ✅ **Day 7 Coding Challenge Day** (`Day-07.../coding-challenges/`) — 15 problems grouped by topic recapping Days 1–6 (Day1 hms/BMI · Day2 initials/palindrome/title-case · Day3 grade/leap-year · Day4 digit-sum/triangle/fibonacci · Day5 temp-convert/`*args`-stats · Day6 word-freq/set-compare/gradebook), each a `qNN_*.py` stub + verified `_solution.py`, plus a grouped `README.md` with approach hints (no SOLUTIONS.md).
 - ✅ **Python power-up week (Days 1–7) is fully built and verified.** All example scripts print ASCII-only (₹/emoji in comments only) so they run under the Windows console codepage.
 - ✅ **Day 8** complete (Python for AI — requests / async / dotenv / type hints / Pydantic; 5 modules + 2 exercises).
-- ✅ **Day 9** complete (LLM fundamentals & first **Groq** call; 5 modules + 2 exercises). Provider switched Gemini→**Groq** course-wide (`groq` + `llama-3.1-8b-instant`); embeddings stay local/Gemini for Day 16. Folder: `Day-09-LLM-Fundamentals-First-Groq-Call`.
+- ✅ **Day 9** complete (LLM fundamentals & first **Groq** call; 5 modules + 2 exercises). Provider switched Gemini→**Groq** course-wide (`groq` + `llama-3.1-8b-instant`); embeddings stay local/Gemini for Day 17. Folder: `Day-09-LLM-Fundamentals-First-Groq-Call`.
 - ✅ **Day 10** complete (Prompt engineering I — system prompts / zero-shot / few-shot / chain-of-thought / anatomy-checklist; 5 modules + 2 exercises). All Groq, temperature 0; module 05 + checklist run offline. Folder: `Day-10-Prompt-Engineering-I`.
 - ✅ **GitHub Basics mini-track** — a beginner 3-part visual deck woven into Days 4–6, each in a `github-basics/` folder (`index.html` + speaker-notes `README.md`): Day 4 *Why GitHub* (commit-timeline + local/remote SVGs) · Day 5 *Everyday Workflow* (add/commit/push staging SVG, `.gitignore`) · Day 6 *Branching & Collaboration* (branch-and-merge SVG, PRs). Same Softpro deck template as the career talks, with added `.cmd`/`.diagram` styles; explanations use inline SVG.
-- ⏳ Day 11+ (AI track) next.
+- ✅ **Day 16 — CLI Chatbot (conversation memory)** in `Phase-2-RAG-and-Memory/Day-16-CLI-Chatbot/` — **Groq**, free. 6 step modules (single-turn → chat-loop → no-memory demo → **appending-messages** (the core: keep a `messages` list, append every turn) → system-prompt → commands/save with `/reset` `/save` `/load` JSON) + `exercises/` (turn-counter, persona-picker; each stub + `_solution.py`). All 11 `.py` compile. Inserting it as Day 16 cascaded the plan **+1 → 46 days** (Phase 2 → 16–26, Phase 3 → 27–38, Phase 4 → 39–46) across `README.md`, `COURSE-PLAN.md`, and this file.
+- ⏳ **Day 11** built but **held back** (still Gemini-based — needs Groq conversion to match the course switch); preserved with Days 12–15 in branch `backup/pre-rebase-day16`, not yet on remote.
+- ⏳ Day 11 conversion + Days 12–15 to reconcile/push next.
 - ⏳ Career decks Days 8–45 to follow; Days 4–7 trainer's guides optional (not yet written).
 - Repo initialized (git).
