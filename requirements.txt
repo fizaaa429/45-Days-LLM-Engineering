@@ -42,6 +42,10 @@ langchain-huggingface      # local sentence-transformers embeddings through Lang
 langchain-text-splitters   # RecursiveCharacterTextSplitter (chunking for RAG)
 # reuses langchain + langchain-groq + sentence-transformers + streamlit + python-dotenv (above)
 
-# --- Phase 3 · Day 23 — LangGraph: State Machines for AI ---
+# --- Phase 3 · Day 24 — LangGraph: State Machines for AI ---
 langgraph                  # graphs of nodes/edges: branching, loops, memory (checkpointers) — v1.x
 # reuses langchain-groq + langchain-core + python-dotenv (already listed above)
+
+# --- Phase 3 · Day 25 — Building a ReAct Agent (create_agent) ---
+# no new deps: create_agent ships in `langchain` (langchain.agents); reuses
+# langchain + langgraph + langchain-groq + streamlit + python-dotenv (all above)

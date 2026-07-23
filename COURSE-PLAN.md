@@ -98,7 +98,7 @@ framework everything else builds on (LangChain), then LangGraph, then real agent
 | 22 | **LangChain in practice** — RAG **with LangChain** (splitters, `Chroma` + local embeddings, retrievers, an LCEL RAG chain) + a **Streamlit × LangChain** chatbot & "chat with your docs" app ✅ |
 | 23 | **LangChain tools + Chat With Your Database** — tools / function calling (`@tool`, `bind_tools`), the hand-written tool-calling loop, and a **text-to-SQL agent** over a SQLite store (CLI + Streamlit) ✅ |
 | 24 | **LangGraph** — state machines for AI: state/nodes/edges, branching (conditional edges), loops (cycles), reducers (`add_messages`), memory (checkpointer + `thread_id`) ✅ |
-| 25 | Building a ReAct agent (`create_agent`) — combines Day 23's tools + Day 24's graph engine |
+| 25 | **Building a ReAct agent** (`create_agent`) — the ReAct loop (Reason→Act→Observe) in one line; a model + toolbox, `system_prompt`, streaming the steps, and memory (checkpointer + `thread_id`); mini-project **SoftBot** (multi-tool assistant, CLI + Streamlit) ✅ |
 | 26 | CrewAI — role-based multi-agent, made simple |
 | 27 | AutoGen (Microsoft) — conversation-based multi-agent |
 | 28 | Framework comparison workshop — same agent in 3 frameworks, pick which fits |

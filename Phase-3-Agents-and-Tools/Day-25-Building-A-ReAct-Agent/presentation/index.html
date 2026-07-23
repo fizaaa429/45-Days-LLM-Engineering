@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Building a ReAct Agent · Day 25 · Softpro School of AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root{
+    --bg:#211f1d; --slide:#ffffff; --cream:#fbf1e6; --cream2:#fdf8f1;
+    --ink:#2c2a28; --ink-soft:#4f463f; --muted:#8a7f73; --line:#efe3d4;
+    --primary:#e8590c; --primary2:#fb8b3d; --gold:#d99000; --steel:#4e6e81; --olive:#6b8e23; --berry:#c0392b;
+    --radius:24px;
+    --shadow:0 30px 80px -20px rgba(20,12,4,.45),0 8px 24px -12px rgba(20,12,4,.3);
+    --font:"Plus Jakarta Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;
+    background:radial-gradient(900px 600px at 12% 0%,#2e2a25 0%,transparent 55%),
+               radial-gradient(900px 600px at 100% 100%,#2a201a 0%,transparent 55%),var(--bg);
+    overflow:hidden}
+  .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(12px,3vh,44px)}
+  .slide{display:none;width:min(1160px,96vw);height:min(700px,92vh);background:
+      radial-gradient(1100px 480px at 88% -12%,rgba(232,89,12,.06),transparent 60%),var(--slide);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(28px,5vw,60px);
+    overflow:hidden;position:relative;flex-direction:column;justify-content:center}
+  .slide.active{display:flex;animation:rise .5s cubic-bezier(.2,.7,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .slide.active>*{animation:fade .6s both}.slide.active>*:nth-child(2){animation-delay:.07s}
+  .slide.active>*:nth-child(3){animation-delay:.14s}.slide.active>*:nth-child(4){animation-delay:.21s}
+  .slide.active>*:nth-child(5){animation-delay:.28s}.slide.active>*:nth-child(6){animation-delay:.35s}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .kicker{font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);margin-bottom:14px}
+  h1{font-size:clamp(2.1rem,5.2vw,3.5rem);font-weight:800;line-height:1.05;letter-spacing:-.02em}
+  h2{font-size:clamp(1.6rem,3.6vw,2.4rem);font-weight:800;line-height:1.1;letter-spacing:-.01em;margin-bottom:18px}
+  p{font-size:clamp(1rem,1.7vw,1.22rem);color:var(--ink-soft);line-height:1.6;max-width:62ch}
+  .lead{font-size:clamp(1.1rem,2vw,1.4rem)}
+  strong{color:var(--ink)}.muted{color:var(--muted)}
+  .grid{display:grid;gap:16px;margin-top:8px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--cream);border:1px solid var(--line);border-radius:18px;padding:18px 20px;transition:transform .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 30px -16px rgba(20,12,4,.35)}
+  .card h3{font-size:1.08rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .card p{font-size:.96rem;max-width:none}
+  .pill{display:inline-block;background:var(--cream);border:1px solid var(--line);border-radius:999px;
+    padding:7px 16px;font-size:.92rem;font-weight:600;color:var(--ink-soft);margin:5px 6px 0 0}
+  ul.clean{list-style:none;margin-top:10px}
+  ul.clean li{font-size:clamp(1rem,1.7vw,1.18rem);color:var(--ink-soft);line-height:1.5;padding:8px 0 8px 34px;position:relative}
+  ul.clean li::before{content:"";position:absolute;left:0;top:15px;width:14px;height:14px;border-radius:50%;
+    background:var(--primary);box-shadow:0 0 0 4px rgba(232,89,12,.15)}
+  ul.clean li.x::before{background:var(--berry);box-shadow:0 0 0 4px rgba(192,57,43,.15)}
+  ul.clean li.ok::before{background:var(--olive);box-shadow:0 0 0 4px rgba(107,142,35,.15)}
+  .fx{font-family:var(--mono);font-size:.98rem;background:var(--cream);border:1px solid var(--line);
+    border-radius:14px;padding:16px 18px;margin-top:10px;color:var(--ink);line-height:1.7;white-space:pre}
+  .action{background:linear-gradient(135deg,#fff,var(--cream2));border:2px solid var(--primary);
+    border-radius:20px;padding:22px 24px;margin-top:14px}
+  .action .tag{font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--primary)}
+  .action p{font-size:1.12rem;color:var(--ink);font-weight:600;margin-top:6px;max-width:none}
+  .eg{background:var(--cream2);border:1px solid var(--line);border-left:4px solid var(--gold);
+    border-radius:12px;padding:13px 16px;margin-top:14px}
+  .eg .tag{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:5px}
+  .eg p{font-size:.98rem;max-width:none;margin:0;color:var(--ink-soft)}
+  .eg code,.card code,p code,li code{font-family:var(--mono);background:rgba(217,144,0,.12);padding:1px 5px;border-radius:5px;font-size:.9em;color:var(--ink)}
+  .cover{background:radial-gradient(1200px 500px at 20% -10%,rgba(232,89,12,.16),transparent 60%),
+      radial-gradient(900px 500px at 100% 120%,rgba(217,144,0,.12),transparent 55%),var(--slide)}
+  .brandbar{display:flex;align-items:center;gap:10px;margin-bottom:auto}
+  .dot{width:13px;height:13px;border-radius:50%;background:var(--primary)}
+  .brandbar span{font-weight:700;letter-spacing:.02em}
+  .cover h1 em{font-style:normal;color:var(--primary)}
+  .footer-note{margin-top:auto;color:var(--muted);font-size:.95rem}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center}
+  .label{font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--primary),var(--primary2));z-index:9;transition:width .3s}
+  .count{position:fixed;left:18px;bottom:14px;color:var(--cream);font-size:.85rem;font-weight:600;opacity:.8;z-index:9;font-variant-numeric:tabular-nums}
+  .nav{position:fixed;right:18px;bottom:14px;display:flex;gap:8px;z-index:9}
+  .nav button{width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.08);color:#fff;font-size:1.1rem;cursor:pointer;backdrop-filter:blur(8px);transition:background .2s}
+  .nav button:hover{background:rgba(255,255,255,.2)}
+  .hint{position:fixed;right:18px;top:16px;color:var(--cream);font-size:.78rem;opacity:.5;z-index:9}
+  .diagram{display:flex;justify-content:center;align-items:center;margin-top:8px}
+  .diagram svg{max-width:100%;height:auto}
+  .cap{text-align:center;color:var(--muted);font-size:.9rem;margin-top:6px}
+  .pipe{display:flex;align-items:stretch;gap:0;margin-top:14px;flex-wrap:wrap}
+  .pipe .stepbox{flex:1;min-width:110px;background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:14px 12px;text-align:center}
+  .pipe .stepbox.model{border-color:var(--primary);background:#fde7d6}
+  .pipe .stepbox h4{font-size:1rem;font-weight:800;color:var(--ink)}
+  .pipe .stepbox small{display:block;color:var(--muted);font-size:.82rem;margin-top:4px}
+  .pipe .arrow{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:800;color:var(--primary);font-size:1.5rem;padding:0 8px}
+  table.cmp{width:100%;border-collapse:collapse;margin-top:12px;font-size:1rem}
+  table.cmp th,table.cmp td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  table.cmp th{font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  table.cmp td.no{color:var(--berry);font-weight:700}
+  table.cmp td.yes{color:var(--olive);font-weight:700}
+  @media(max-width:640px){.g2,.g3,.g4,.twocol{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<div class="hint">→ / Space to advance · F for fullscreen</div>
+<div class="stage" id="stage">
+
+  <!-- 1 COVER -->
+  <section class="slide cover active">
+    <div class="brandbar"><span class="dot"></span><span>Softpro School of AI · Day 25</span></div>
+    <div class="kicker">Phase 3 · Agents &amp; Tools</div>
+    <h1>The ReAct agent:<br>one line that <em>replaces</em> your loop</h1>
+    <p class="lead" style="margin-top:18px">Day 23 you wrote the tool-calling loop by hand. Day 24 you learned the graph engine. Today they fuse: <code style="background:none;color:var(--primary)">create_agent(model, tools)</code> builds a real agent that reasons, calls tools, and answers on its own.</p>
+    <div class="footer-note">Reason → Act → Observe · runs on free Groq · LangChain 1.x.</div>
+  </section>
+
+  <!-- 2 RECAP: THE HAND-WRITTEN LOOP -->
+  <section class="slide">
+    <div class="kicker">Where we were</div>
+    <h2>Day 23: you wrote the loop by hand</h2>
+    <p>To make the model <em>act</em>, you wrote a <code>while</code> loop: ask the model, run any tool it asked for, feed the result back, repeat until it answers.</p>
+    <div class="fx">messages = [SystemMessage(...), HumanMessage(question)]
+for _ in range(MAX_STEPS):
+    ai = model.invoke(messages)
+    messages.append(ai)
+    if not ai.tool_calls:
+        return ai.content                 # ← plain answer, done
+    for call in ai.tool_calls:
+        result = TOOL_MAP[call["name"]].invoke(call["args"])
+        messages.append(ToolMessage(result, tool_call_id=call["id"]))</div>
+    <p class="cap">It worked — but every new agent meant re-writing this plumbing. There's a name for this pattern...</p>
+  </section>
+
+  <!-- 3 REACT -->
+  <section class="slide">
+    <div class="kicker">The pattern has a name</div>
+    <h2>ReAct = Reason + Act</h2>
+    <div class="diagram" style="margin-top:4px">
+      <svg viewBox="0 0 820 190" width="820" height="190" role="img" aria-label="ReAct loop: reason, act, observe, looping back, then answer">
+        <defs><marker id="arR" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a7f73"/></marker></defs>
+        <g font-family="Plus Jakarta Sans" font-size="14" font-weight="700" text-anchor="middle">
+          <rect x="60" y="70" width="150" height="56" rx="14" fill="#fde7d6" stroke="#e8590c"/><text x="135" y="94" fill="#e8590c">🧠 Reason</text><text x="135" y="113" font-size="11" font-weight="500" fill="#8a7f73">need a tool?</text>
+          <rect x="335" y="70" width="150" height="56" rx="14" fill="#fbf1e6" stroke="#efe3d4"/><text x="410" y="94" fill="#2c2a28">🔧 Act</text><text x="410" y="113" font-size="11" font-weight="500" fill="#8a7f73">call the tool</text>
+          <rect x="610" y="70" width="150" height="56" rx="14" fill="#eef3f1" stroke="#6b8e23"/><text x="685" y="94" fill="#3f5a18">👀 Observe</text><text x="685" y="113" font-size="11" font-weight="500" fill="#8a7f73">read the result</text>
+          <path d="M210 98 L 331 98" fill="none" stroke="#8a7f73" stroke-width="2" marker-end="url(#arR)"/>
+          <path d="M485 98 L 606 98" fill="none" stroke="#8a7f73" stroke-width="2" marker-end="url(#arR)"/>
+          <path d="M685 70 Q 685 20 410 20 Q 135 20 135 66" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arR)"/>
+          <text x="410" y="14" font-size="12" font-weight="600" fill="#c0392b">not done yet → reason again</text>
+        </g>
+      </svg>
+    </div>
+    <p style="margin-top:8px">The model <strong>reasons</strong> about what it needs, <strong>acts</strong> by calling a tool, <strong>observes</strong> the result, and loops — until it can answer in plain text. Day 23's <code>while</code> loop <em>was</em> ReAct.</p>
+  </section>
+
+  <!-- 4 THE ONE LINE -->
+  <section class="slide">
+    <div class="kicker">The reveal</div>
+    <h2>All of that, in one line</h2>
+    <div class="fx">from langchain.agents import create_agent
+
+agent  = create_agent(model, tools)                 # ← the whole ReAct loop
+result = agent.invoke({"messages": [("human", "What is 240 + 360?")]})
+answer = result["messages"][-1].content             # "240 + 360 = 600."</div>
+    <div class="eg">
+      <span class="tag">What you just got back</span>
+      <p><code>create_agent</code> returns a <strong>compiled LangGraph agent</strong> — literally yesterday's engine, pre-wired into a model → tools → model cycle. You stop writing loops and start <em>using</em> one.</p>
+    </div>
+    <p class="cap">Because you built it by hand first, this line is <strong>never magic</strong> — you know exactly what's inside.</p>
+  </section>
+
+  <!-- 5 TWO INGREDIENTS -->
+  <section class="slide">
+    <div class="kicker">What goes in</div>
+    <h2>An agent = a model + a list of tools</h2>
+    <div class="twocol">
+      <div>
+        <div class="fx">@tool
+def multiply(a: int, b: int) -> int:
+    """Multiply a and b."""
+    return a * b
+
+agent = create_agent(
+    model,               # calls tools
+    [add, multiply],     # the toolbox
+)</div>
+      </div>
+      <div>
+        <ul class="clean">
+          <li>The tools are <strong>plain Day-23 <code>@tool</code> functions</strong> — nothing new.</li>
+          <li>The <strong>only</strong> change from Day 23: you no longer write the loop that calls them.</li>
+          <li>Input is <code>{"messages": [("human", "…")]}</code>; the answer is the <strong>last</strong> message.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="eg"><span class="tag">Gotcha</span><p>The agent returns the <strong>whole conversation</strong>, not a string. Read <code>result["messages"][-1].content</code> — forgetting that is the #1 first-time mistake.</p></div>
+  </section>
+
+  <!-- 6 THE MESSAGE TRAIL -->
+  <section class="slide">
+    <div class="kicker">Inside the loop</div>
+    <h2>Every step is a message</h2>
+    <p>The agent's answer is a <strong>trail</strong> of messages — and it's exactly the shape of Day 23's loop:</p>
+    <div class="fx">1. HumanMessage   "Multiply 6 by 7, then add 100."
+2. AIMessage      tool_calls=[multiply(6, 7)]      ← Reason + Act
+3. ToolMessage    "42"                             ← Observe
+4. AIMessage      tool_calls=[add(42, 100)]        ← Reason + Act
+5. ToolMessage    "142"                            ← Observe
+6. AIMessage      "6 x 7 = 42, and 42 + 100 = 142" ← Answer</div>
+    <p class="cap">Model → Tool → Model → Tool → Model. Same loop you hand-wrote — now generated for you.</p>
+  </section>
+
+  <!-- 7 STREAM -->
+  <section class="slide">
+    <div class="kicker">Watch it live</div>
+    <h2>Stream the steps as they happen</h2>
+    <div class="twocol">
+      <div>
+        <div class="fx">for chunk in agent.stream(
+    {"messages": [("human", q)]},
+    stream_mode="updates"):
+  for node, upd in chunk.items():
+    print(node, upd["messages"][-1])
+
+# [model] wants: multiply(6, 7)
+# [tools] result: 42
+# [model] wants: add(42, 100)
+# [tools] result: 142
+# [model] "…= 142."</div>
+      </div>
+      <div>
+        <p>Two node names tell the whole story:</p>
+        <ul class="clean">
+          <li><code>model</code> — the LLM reasoning &amp; acting.</li>
+          <li><code>tools</code> — a tool being run.</li>
+        </ul>
+        <p style="margin-top:10px">That stream is what powers the <strong>"How I got this"</strong> tool-trace you'll show users in the mini-project.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 SYSTEM PROMPT + TOOLBOX -->
+  <section class="slide">
+    <div class="kicker">Steer it</div>
+    <h2>A system prompt + a toolbox it routes itself</h2>
+    <div class="fx">agent = create_agent(model, [calculator, search_handbook, word_count],
+    system_prompt="You are SoftBot. Always use a tool for maths or "
+                  "lookups — never guess. Keep answers short.")</div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card"><h3>🎭 System prompt</h3><p>The agent's job description — persona + rules. <em>"Never guess the maths, use the tool"</em> is the classic one.</p></div>
+      <div class="card"><h3>🧰 The model picks</h3><p>Hand over many tools; ask a mixed question; it calls the right ones in order. <strong>You write zero routing.</strong> That self-routing is what makes it an agent.</p></div>
+    </div>
+    <div class="eg"><span class="tag">So write good docstrings</span><p>A tool's <strong>docstring + argument names</strong> are the model's only instructions for when to use it. Vague docstring → wrong tool. Write it like you're briefing a new teammate.</p></div>
+  </section>
+
+  <!-- 9 MEMORY -->
+  <section class="slide">
+    <div class="kicker">Make it conversational</div>
+    <h2>Memory: the same two knobs as Day 24</h2>
+    <div class="twocol">
+      <div>
+        <div class="fx">from langgraph.checkpoint.memory \
+    import MemorySaver
+
+agent = create_agent(
+    model, tools,
+    checkpointer=MemorySaver())
+
+cfg = {"configurable":
+       {"thread_id": "roll-42"}}
+agent.invoke({"messages":
+  [("human", "Hi, I'm Aditi")]}, cfg)
+agent.invoke({"messages":
+  [("human", "my name?")]}, cfg)  # Aditi</div>
+      </div>
+      <div>
+        <ul class="clean">
+          <li>Compile with a <strong>checkpointer</strong> → history is saved.</li>
+          <li>Pass a <strong>thread_id</strong> → same id remembers, new id starts clean.</li>
+          <li>Each turn send <strong>only the new message</strong>; the rest reloads.</li>
+        </ul>
+        <div class="eg" style="margin-top:10px"><span class="tag">Exactly Day 24</span><p>Identical to yesterday's chatbot — the only difference is this bot <strong>also has tools</strong>. One <code>thread_id</code> per user = many private chats from one agent.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 BEFORE / AFTER -->
+  <section class="slide">
+    <div class="kicker">Put side by side</div>
+    <h2>By hand (Day 23) vs <code>create_agent</code> (today)</h2>
+    <table class="cmp">
+      <tr><th>Concern</th><th>Day 23 — by hand</th><th>Day 25 — create_agent</th></tr>
+      <tr><td>The tool-calling loop</td><td class="no">~15 lines of while</td><td class="yes">✅ 1 line</td></tr>
+      <tr><td>Feed tool results back</td><td class="no">you append ToolMessages</td><td class="yes">✅ automatic</td></tr>
+      <tr><td>Stop runaway loops</td><td>your <code>MAX_STEPS</code></td><td class="yes">✅ <code>recursion_limit</code> built in</td></tr>
+      <tr><td>Memory across turns</td><td class="no">pass the list back yourself</td><td class="yes">✅ checkpointer + thread_id</td></tr>
+      <tr><td>Understanding what it does</td><td class="yes">✅ you wrote it</td><td class="yes">✅ same loop, you know it</td></tr>
+    </table>
+    <p class="cap">Building it by hand first is <em>why</em> the one-liner isn't magic. Same loop, less typing.</p>
+  </section>
+
+  <!-- 11 MINI PROJECT -->
+  <section class="slide">
+    <div class="kicker">Today's build · mini-project</div>
+    <h2>SoftBot — one line, scaled up 6 times</h2>
+    <p>A multi-tool <strong>campus assistant</strong> for Softpro students, grown one concept at a time — your on-ramp to <strong>Project 3</strong> (which must use 3+ tools). SoftBot already uses three.</p>
+    <div class="pipe" style="margin-top:14px">
+      <div class="stepbox"><h4>1</h4><small>hello agent<br>one tool</small></div>
+      <div class="arrow">→</div>
+      <div class="stepbox"><h4>2</h4><small>watch the loop<br>stream</small></div>
+      <div class="arrow">→</div>
+      <div class="stepbox"><h4>3</h4><small>toolbox<br>self-routing</small></div>
+      <div class="arrow">→</div>
+      <div class="stepbox"><h4>4</h4><small>persona<br>system prompt</small></div>
+      <div class="arrow">→</div>
+      <div class="stepbox"><h4>5</h4><small>memory<br>thread_id</small></div>
+      <div class="arrow">→</div>
+      <div class="stepbox model"><h4>6</h4><small>brain + web UI<br>"How I got this"</small></div>
+    </div>
+    <p class="cap">All six steps run with <strong>no API key</strong> (a scripted stand-in drives the real agent). Folder: <code>mini-project/</code></p>
+  </section>
+
+  <!-- 12 ROADMAP -->
+  <section class="slide">
+    <div class="kicker">Where it fits</div>
+    <h2>Tools + engine = an agent that acts</h2>
+    <div class="diagram" style="margin-top:6px">
+      <svg viewBox="0 0 860 150" width="860" height="150" role="img" aria-label="Roadmap: Day 23 tools, Day 24 engine, Day 25 create_agent, Day 26 multi-agent">
+        <defs><marker id="arC" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a7f73"/></marker></defs>
+        <g font-family="Plus Jakarta Sans" font-size="13" font-weight="700" text-anchor="middle">
+          <rect x="20" y="55" width="180" height="48" rx="12" fill="#fbf1e6" stroke="#efe3d4"/><text x="110" y="79" fill="#2c2a28">Day 23 · Tools</text><text x="110" y="95" font-size="10.5" font-weight="500" fill="#8a7f73">@tool · hand-written loop</text>
+          <rect x="240" y="55" width="180" height="48" rx="12" fill="#fbf1e6" stroke="#efe3d4"/><text x="330" y="79" fill="#2c2a28">Day 24 · LangGraph</text><text x="330" y="95" font-size="10.5" font-weight="500" fill="#8a7f73">the loop engine</text>
+          <rect x="460" y="55" width="180" height="48" rx="12" fill="#fde7d6" stroke="#e8590c"/><text x="550" y="79" fill="#e8590c">Day 25 · create_agent</text><text x="550" y="95" font-size="10.5" font-weight="500" fill="#8a7f73">both, in one line</text>
+          <rect x="680" y="55" width="180" height="48" rx="12" fill="#eef3f1" stroke="#6b8e23"/><text x="770" y="79" fill="#3f5a18">Day 26 · CrewAI</text><text x="770" y="95" font-size="10.5" font-weight="500" fill="#8a7f73">many agents</text>
+          <line x1="200" y1="79" x2="236" y2="79" stroke="#8a7f73" stroke-width="2" marker-end="url(#arC)"/>
+          <line x1="420" y1="79" x2="456" y2="79" stroke="#8a7f73" stroke-width="2" marker-end="url(#arC)"/>
+          <line x1="640" y1="79" x2="676" y2="79" stroke="#8a7f73" stroke-width="2" marker-end="url(#arC)"/>
+        </g>
+      </svg>
+    </div>
+    <p style="margin-top:10px">Day 23's <code>while</code> loop was just a graph with a backward edge. Day 24 gave you that engine. <code>create_agent</code> assembles it for you — model node → tools node → loop until done. Tomorrow: when <strong>one</strong> agent isn't enough.</p>
+  </section>
+
+  <!-- 13 RECAP -->
+  <section class="slide">
+    <div class="kicker">Recap</div>
+    <h2>Five things to walk away with</h2>
+    <ul class="clean">
+      <li><strong>ReAct</strong> = Reason → Act → Observe, looping until the model can answer.</li>
+      <li><code>create_agent(model, tools)</code> builds that loop in one line — a compiled LangGraph agent.</li>
+      <li>Invoke with <code>{"messages": […]}</code>; the answer is <code>result["messages"][-1].content</code>.</li>
+      <li>Steer with <code>system_prompt</code>; hand over a toolbox and the <strong>model self-routes</strong>.</li>
+      <li>Add memory with <code>checkpointer</code> + <code>thread_id</code> — same as Day 24.</li>
+    </ul>
+    <div class="action"><span class="tag">⏱ Your move</span><p>Run modules <code>01 → 05</code> (all offline), build <strong>SoftBot</strong> step by step, then do the two <code>exercises/</code>.</p></div>
+  </section>
+
+  <!-- 14 CLOSE -->
+  <section class="slide cover">
+    <div class="brandbar"><span class="dot"></span><span>Softpro School of AI · Day 25</span></div>
+    <h1>You wrote the loop.<br>Now you just <em>use</em> it.</h1>
+    <p class="lead" style="margin-top:18px">A ReAct agent reasons, calls tools, observes, and answers on its own — from <code style="background:none;color:var(--primary)">create_agent(model, tools)</code>. From here on you compose agents; you don't hand-build the loop.</p>
+    <div class="footer-note">Next (Day 26): CrewAI — give several agents roles and let them collaborate.</div>
+  </section>
+
+</div>
+
+<div class="count" id="count">1 / 14</div>
+<div class="nav"><button id="prev" aria-label="Previous">‹</button><button id="full" aria-label="Fullscreen">⛶</button><button id="next" aria-label="Next">›</button></div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];let i=0;
+  const bar=document.getElementById('bar'),count=document.getElementById('count');
+  function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    bar.style.width=((i+1)/slides.length*100)+'%';count.textContent=(i+1)+' / '+slides.length;}
+  function next(){show(i+1)}function prev(){show(i-1)}
+  document.getElementById('next').onclick=next;document.getElementById('prev').onclick=prev;
+  document.getElementById('full').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ')next();
+    else if(e.key==='ArrowLeft')prev();
+    else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1);
+    else if(e.key==='f'||e.key==='F')document.getElementById('full').click();});
+  document.getElementById('stage').addEventListener('click',e=>{
+    if(e.target.closest('.nav'))return;const x=e.clientX/window.innerWidth;x>0.5?next():prev();});
+  show(0);
+</script>
+</body>
+</html>
